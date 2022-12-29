@@ -1,5 +1,5 @@
 # MyPythonModule
 Practice Python
 
-###　pythonの勉強中に作成したmoduleたち
+### pythonの勉強中に作成したmoduleたち
 アドバイス等あればよろしくお願いいたします。
