@@ -18,22 +18,7 @@ class DL_ZIP_FROM_JRDB(object):
     def __init__(self):
         service = Service(executable_path=GECKODRIVER_PATH)
         browser = webdriver.Firefox(service=service)
-        browser.get(f'http://{JRDB_ID}:{JRDB_PASS}@www.jrdb.com/member/n_index.html')
-        time.sleep(5)
-        #JRDBデータをクリックして、最新データページへ移動する
-        browser.find_element(By.LINK_TEXT,'ＪＲＤＢデータ').click()
-        time.sleep(1)
-        browser.find_element(By.XPATH,'/html/body/div[1]/div[15]/div[2]/div[7]/div/div[2]/a[1]').click()
-        time.sleep(2)
-        #現在操作中のwindow（またはタブ）
-        current_window = browser.current_window_handle
-        #現在開いているwindowたち
-        windows = browser.window_handles
-        #もし現在のwindow以外のものがあればそっちに切り替える。
-        for window in windows:
-            if window != current_window:
-                browser.switch_to.window(window)
-                break
+        browser.get(f'http://{JRDB_ID}:{JRDB_PASS}@www.jrdb.com/member/data/')
 
         #現在のURLの取得
         url = browser.current_url
@@ -44,7 +29,7 @@ class DL_ZIP_FROM_JRDB(object):
         self.url = url
         self.soup = soup
         self.browser = browser
-           
+
     def search_ziptag(self, tag_text):
         """
         tdを全部取得。
