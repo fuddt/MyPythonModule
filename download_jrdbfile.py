@@ -1,20 +1,15 @@
-import os,sys
-sys.path.append(os.pardir)
-from settings import JRDB_PASS, JRDB_ID,GECKODRIVER_PATH
 import requests
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
-from selenium.webdriver.common.by import By
 import time
 from bs4 import BeautifulSoup
 import urllib
 import zipfile
-"""
-JRDBの会員ページから最新のPACIとSEDをzipファイルをダウンロードして展開するmodule
-IDとPASSは別ファイルから取得する
-"""
+import inspect
+import os
+import glob
 
-class DL_ZIP_FROM_JRDB(object):
+class DownloadFlowZipFileFromJRDB(object):
     def __init__(self):
         service = Service(executable_path=GECKODRIVER_PATH)
         browser = webdriver.Firefox(service=service)
@@ -41,6 +36,21 @@ class DL_ZIP_FROM_JRDB(object):
             if tag.text == tag_text:
                 ziptag.append(tag)
         return ziptag
+    
+    def select_zip(self,ziptag):
+        ind = None
+        if len(ziptag) > 1:
+            items = [tag.find_previous().find_previous().find_previous().text for tag in ziptag]
+            print(ziptag[0])
+            for num,item in enumerate(items):
+                print(num,item)    
+            ind = int(input('please choose one'))
+            if ind > len(items):
+                raise ValueError('選択肢以外の数字が入りました。')
+        if ind == None:
+            ind =0
+        return int(ind)
+    
 
     # tagからzipファイルのダウンロードurlを取得する
     def get_zip_url(self, tag):
@@ -48,45 +58,61 @@ class DL_ZIP_FROM_JRDB(object):
         １行目:zipファイルは上記で見つけたタグの４つ先のタグになる。
         ２行目:タグ内の属性値の取り出し。タグ内に属性があると辞書型で属性:値という構成で返してくれる。
         """
-        zipfile_tag = tag[0].find_next().find_next().find_next().find_next()
+        
+        ind = self.select_zip(tag)
+        
+        zipfile_tag = tag[ind].find_next().find_next().find_next().find_next()
         zipurl = zipfile_tag.attrs['href']
         return zipurl
 
-    def zip_download(self, zipurl, savedir_name, to_dir = None):
+    def zip_download(self, zipurl, savefile_name):
         # zipfileのlinkURLが相対パスになっているので、絶対パスに直す urllibを使用
         zipurl = urllib.parse.urljoin(self.url, zipurl)
-        if to_dir == None:
-            to_dir = os.getcwd()
-
         #ファイルのDLはrequests.get(zipファイルのurl)でDL可能
         zipreq = requests.get(zipurl)
         #zipファイルの保存
-        with open(savedir_name,'wb') as f:
+        with open(savefile_name,'wb') as f:
             for chunk in zipreq.iter_content(chunk_size=100000):
                 if chunk:
                     f.write(chunk)
-        #zipファイルの展開
-        extractor = zipfile.ZipFile(savedir_name)
-        extractor.extractall(to_dir)
 
-def download_jrdb_zipfile(savedir,todir):
-    try:
-        dl_zip_from_jrdb = DL_ZIP_FROM_JRDB()
-        time.sleep(2)
-        #SEDのzipファイルを探す。
-        sed_zip_tag = dl_zip_from_jrdb.search_ziptag('JRDB成績速報データ(SED)')
-        #PACIのzipファイルを探す。
-        paci_zip_tag = dl_zip_from_jrdb.search_ziptag('JRDBデータパック(PACI)')
-        #zipファイルのURLの取得
-        sed_zip_url = dl_zip_from_jrdb.get_zip_url(sed_zip_tag)
-        paci_zip_url = dl_zip_from_jrdb.get_zip_url(paci_zip_tag)
-        #zipのDLと展開
-        dl_zip_from_jrdb.zip_download(sed_zip_url, savedir , todir)
-        #一応、待機
-        time.sleep(2)
-        dl_zip_from_jrdb.zip_download(paci_zip_url, savedir, todir)
-        #すべての処理が終わり次第、ブラウザを閉じる
-        dl_zip_from_jrdb.browser.close()
-    except Exception as e:
-        print(e,'\nエラーが発生しました。')
-        dl_zip_from_jrdb.browser.close()
+
+class DownLoadJRDBZipFile(object):
+    def __init__(self):
+        filename = inspect.getfile( inspect.currentframe() ) # module file name
+        self.dirpath = os.path.dirname(filename)
+        self.store_dir = os.path.join(self.dirpath,'PACI')
+    
+    def download_jrdb_zipfile(self, store_dir = None):
+        if store_dir:
+            self.store_dir = store_dir
+        else:
+            pass
+        try:
+            dl_zip_from_jrdb = DownloadFlowZipFileFromJRDB()
+            time.sleep(2)
+            #SEDのzipファイルを探す。
+            sed_zip_tag = dl_zip_from_jrdb.search_ziptag('JRDB成績速報データ(SED)')
+            #PACIのzipファイルを探す。
+            paci_zip_tag = dl_zip_from_jrdb.search_ziptag('JRDBデータパック(PACI)')
+            #zipファイルのURLの取得
+            sed_zip_url = dl_zip_from_jrdb.get_zip_url(sed_zip_tag)
+            paci_zip_url = dl_zip_from_jrdb.get_zip_url(paci_zip_tag)
+            #zipのDL
+            dl_zip_from_jrdb.zip_download(sed_zip_url, os.path.join(self.store_dir,'SED.zip'))
+            time.sleep(2)#一応、待機
+            dl_zip_from_jrdb.zip_download(paci_zip_url, os.path.join(self.store_dir,'PACI.zip'))
+            #すべての処理が終わり次第、ブラウザを閉じる
+            dl_zip_from_jrdb.browser.close()
+        except Exception as e:
+            print(e,'\nエラーが発生しました。')
+            dl_zip_from_jrdb.browser.close()
+
+    def zip_extract(self):
+        #zipファイルの展開
+        filepaths = glob.glob(os.path.join(self.store_dir, '*.zip'))
+        for filepath in filepaths:
+            extractor = zipfile.ZipFile(filepath)
+            extractor.extractall(os.path.dirname(filepath))
+            #zipファイルの削除
+            os.remove(filepath)
