@@ -2,6 +2,7 @@
 import numpy as np
 from abc import ABC,abstractmethod
 
+
 class Combination(ABC):
   def __init__(self,horse_num):
     if type(horse_num) != list and not isinstance(horse_num,np.ndarray):
@@ -72,7 +73,9 @@ class MakeCombination(object):
         obj.combination_ticket()
 
 class TicketCombination(MakeCombination):
-
+  """
+  馬券の組み合わせを計算
+  """
   def combination_bracket(self,horse_num):
     return self._make_combination(CombinationBracketQuinella(horse_num))
 
