@@ -2,14 +2,14 @@ import zipfile
 import os
 import glob
 
-def zipExtractorMeantForInDir(dir_with_zip,to_dir=None):
+def zip_extract(dir_with_zip,to_dir=None):
     """
     summary:
-    ディレクトリ内のzipファイルをすべて展開します。
+    ディレクトリ内のzipファイルをすべて展開する。
 
     Args:
         dir_with_zip (str): zipファイルが入ったディレクトリ を指定
-        to_dir (srt): 展開先ディレクトリ
+        to_dir (srt): 展開先ディレクトリ ->　指定がなければzipファイルが存在するディレクリに展開します。
     """
     if to_dir:
         pass
