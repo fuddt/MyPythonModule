@@ -18,10 +18,8 @@ class DownloadFlowZipFileFromJRDB(object):
         # BeautifulSoupでファイルのダウンロードを行う。
         req = requests.get(url)
         soup = BeautifulSoup(req.content, 'html.parser')
-
         self.url = url
         self.soup = soup
-        # self.browser = browser
 
     def search_ziptag(self, tag_text):
         """
