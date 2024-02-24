@@ -14,7 +14,7 @@ JRDB_PASSWORD = "*******"
 class DownloadFlowZipFileFromJRDB(object):
     def __init__(self):
         #現在のURLの取得
-        url = (f'http://{JRDB_ID}:{JRDB_PASS}@www.jrdb.com/member/data/')
+        url = (f'http://{JRDB_ID}:{JRDB_PASSWORD}@www.jrdb.com/member/data/')
         # BeautifulSoupでファイルのダウンロードを行う。
         req = requests.get(url)
         soup = BeautifulSoup(req.content, 'html.parser')
