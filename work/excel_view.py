@@ -44,71 +44,47 @@ class ExcelView:
         DataKubun	MakeDate	Year	MonthDay	
     SE	A	        20050303	1987	0519	    
     SE	A	        20060508	1987	0602	    
-
-
     """
-
-
-
-    def __init__(self, filename):
-        self.workbook = openpyxl.load_workbook(filename)
-        self.sheetnames = self.workbook.sheetnames
-
-    @staticmethod
-    def _to_excel_column_name(n):
-        """
-        Excelの列名に変換する関数
-        ASCIIコードでは、65は文字「A」を表します
-        """
-        if n < 26:
-            return chr(n + 65)
-        else:
-            return chr(n // 26 + 64) + chr(n % 26 + 65)
-    @staticmethod
-    def _to_excel_index(n):
-        # インデックスを作成（Excelの行番号）
-        return list(range(1, n+1))
     
-    def view_sheet(self, sheetname, format='reference'):
-        sheet = self.workbook[sheetname]
-        if format == 'excel':
+    def __init__(self, filename: str):
+        self.workbook = openpyxl.load_workbook(filename)
+
+    def view_sheet(self, sheet_name: str, format_type: str = 'reference') -> pd.DataFrame:
+        if sheet_name not in self.workbook.sheetnames:
+            raise ValueError(f'Sheet {sheet_name} が見つかりません。')
+
+        sheet = self.workbook[sheet_name]
+        if format_type == 'excel':
             return self._view_sheet_as_excel(sheet)
-        elif format == 'pandas':
+        elif format_type == 'pandas':
             return self._view_sheet_as_pandas(sheet)
-        elif format == 'reference':
+        elif format_type == 'reference':
             return self._view_sheet_as_reference(sheet)
         else:
-            raise ValueError(f'format {format} is not supported')
-
-    def _view_sheet_as_excel(self, sheet):
-        """
-        Excelの列名と行番号に準じた形式
-        """
-        df = pd.DataFrame(sheet.values)
-        column_names = list(map(self._to_excel_column_name, range(df.shape[1])))
-        df.columns = column_names
-        # インデックスを作成（Excelの行番号）
-        idx = self._to_excel_index(df.shape[0])
-        df.index = idx
+            raise ValueError(f'Format {format_type} はサポート対象外です。')
+        
+    @staticmethod
+    def _to_excel_column_name(n: int) -> str:
+        """Excelの列名に変換する関数。ASCIIコードでは、65は文字「A」を表す。"""
+        string = ""
+        while n > 0:
+            n, remainder = divmod(n - 1, 26)
+            string = chr(65 + remainder) + string
+        return string
+    
+    def _view_sheet_as_excel(self, sheet) -> pd.DataFrame:
+        data = list(sheet.values)
+        column_names = [self._to_excel_column_name(i) for i in range(1, len(data[0]) + 1)]
+        df = pd.DataFrame(data[1:], 
+                          columns=column_names, 
+                          index=pd.RangeIndex(start=1, stop=len(data)+1))
         return df
 
-    def _view_sheet_as_pandas(self, sheet):
-        """
-        pandasのDataFrameに準じた形式
-        """
-        data = sheet.values
-        cols = next(data)[1:]
-        data = list(data)
-        data = (islice(r, 1, None) for r in data)
-        return  pd.DataFrame(data, columns=cols)
-    
-    def _view_sheet_as_reference(self, sheet):
-        """
-        openpyxlの公式ドキュメント推奨の方法
-        """
-        data = sheet.values
-        cols = next(data)[1:]
-        data = list(data)
-        idx = [r[0] for r in data]
-        data = (islice(r, 1, None) for r in data)
-        return pd.DataFrame(data, index=idx, columns=cols)
+    def _view_sheet_as_pandas(self, sheet) -> pd.DataFrame:
+        data = list(sheet.values)
+        return pd.DataFrame(data[1:], columns=data[0])
+
+    def _view_sheet_as_reference(self, sheet) -> pd.DataFrame:
+        data = list(sheet.values)
+        index = [r[0] for r in data[1:]]  # Skip header for index
+        return pd.DataFrame(data[1:], columns=data[0], index=index)

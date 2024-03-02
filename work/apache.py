@@ -2,80 +2,60 @@ import pandas as pd
 import polars as pl
 
 
+class ApacheLogReader(object):
+    @classmethod
+    def read_log(cls, logFilePath: str):
+        log = pl.read_csv(logFilePath, 
+                                  has_header=False, 
+                                  separator=" ",
+                                  ignore_errors = True,
+                                  infer_schema_length=10000, 
+                                  truncate_ragged_lines=True,
+                                  new_columns=['IPaddress', 'Ignore1', 'Ignore2', 'DateTime', 'URL', 
+                                                'HTTPSTATE', 'ResponseSize', 'RequestProcessingTime', 
+                                                'Referer', 'UserAgent', 'transmissionSize', 'Cookie', 'Ignore3'])
+        log = log.select(['IPaddress', 'DateTime', 'URL', 
+                        'HTTPSTATE', 'ResponseSize', 'RequestProcessingTime', 
+                        'Referer', 'UserAgent', 'transmissionSize', 'Cookie'])
+        log = cls._process_datetime(log)
+        log = cls._process_url(log)
+        return log
+    
+    @staticmethod
+    def _process_datetime(df: pl.DataFrame) -> pl.DataFrame:
+        return df.with_columns([
+            pl.col('DateTime').str.slice(1, 2).alias('Day'),
+            pl.col('DateTime').str.slice(13).alias('Time'),
+            # その他の日付関連の処理が必要な場合はここに追加
+        ])
+
+    @staticmethod
+    def _process_url(df: pl.DataFrame) -> pl.DataFrame:
+        # URL列をスペースで分割し、新しい列を追加
+        split_url = df.select(pl.col('URL').str.split(' ', inclusive=False).alias('split_url'))
+        return df.with_columns([
+                                split_url['split_url'].arr.get(0).alias('GET_POST'),
+                                split_url['split_url'].arr.get(1).alias('URL')
+                            ]).drop(['split_url'])
+
 class ApacheLog(object):
     def __init__(self, logFilePath: str):
-        i = 0
-        logFile = pl.read_csv(logFilePath, 
-                                  has_header=False, 
-                                  separator=" ",
-                                  ignore_errors = True,
-                                  infer_schema_length=10000, 
-                                  truncate_ragged_lines=True,
-                                 skip_rows = i)
-        while len(logFile.columns) >13:
-            i += 1
-            logFile = pl.read_csv(logFilePath, 
-                                  has_header=False, 
-                                  separator=" ",
-                                  ignore_errors = True,
-                                  infer_schema_length=10000, 
-                                  truncate_ragged_lines=True,
-                                 skip_rows = i)
-        
-        logFile = self._process_column(logFile)
-        logFile = self._process_url(logFile)
-        self.logFile = pl.from_pandas(logFile)
+        self.logFile = ApacheLogReader.read_log(logFilePath)
 
     def __str__(self) -> str:
         return str(self.logFile)
 
-    @staticmethod
-    def _process_column(df: pl.DataFrame) -> pl.DataFrame:
-        #日付から日付のみを取得する
-        def get_day( value):
-            return value[1:3]
-        # 日付から無駄を除外する
-        def remove_date(value):
-            return value[13:]
-
-        df = df.select(pl.col(['column_1','column_4', 'column_6', 'column_7', 'column_8',
-                            'column_9', 'column_10', 'column_11', 'column_12', 'column_13']))
-        # 日付の処理をする
-        df =  df.with_columns(pl.col("column_4").map_elements(get_day).alias("Day"),
-                            pl.col("column_4").map_elements(remove_date).alias("Time"))
-
-        # データ成型第1段階
-        df = df.select(pl.col([ 'column_1', 'Day','Time','column_6', 'column_7', 'column_8', 
-                                'column_9', 'column_10','column_11', 'column_12', 'column_13']))
-        # カラム名をつけてあげる
-        df.columns = ['IPaddress', 'Day', 'Time','URL','HTTPSTATE', 'ResponseSize', 
-                        'RequestProcessingTime', 'Referer', 'UserAgent', 'transmissionSize','Cookie']
-
-        return df
-
-    @staticmethod
-    def _process_url(df: pl.DataFrame) -> pl.DataFrame:        
-        data_pd = df.to_pandas()
-        data_pd = data_pd["URL"].str.split(" " ,expand=True).drop(2, axis=1)
-        data_pd.columns = ["GET_POST", "URL"]
-        
-        # 結合する
-        data = df.to_pandas().drop("URL", axis=1)
-        data = pd.concat([data, data_pd], axis=1)
-        return data.loc[:,['IPaddress', 'Day', 'Time', 'GET_POST', 'URL','HTTPSTATE', 'ResponseSize', 'RequestProcessingTime',
-                        'Referer', 'UserAgent', 'transmissionSize','Cookie']]
-        
     #日付でフィルター
     def filter_by_day(self, day: str) -> pl.DataFrame:
         day = int(day)
-        self.logFile = self.logFile.with_columns(pl.col("Day").cast(pl.Int32)).filter(pl.col("Day") == day)
+        return (self.logFile.with_columns(pl.col("Day").cast(pl.Int32))
+                            .filter(pl.col("Day") == day))
     # 時間でフィルター
     def filter_by_time(self, from_time: str, end_time: str) -> pl.DataFrame:
-        self.logFile = self.logFile.filter((pl.col("Time") >= from_time) & (pl.col("Time") <= end_time))
-
+        filter_jouken1 = (pl.col("Time") >= from_time)
+        filter_jouken2 = (pl.col("Time") <= end_time)
+        return self.logFile.filter(filter_jouken1 & filter_jouken2)
+    
+    # CSVファイルに出力
     def to_csv(self, filePath: str):
-        self.logFile.to_pandas().to_csv(filePath, index=False, encoding="cp932")
-
-
-
-
+        self.logFile.write_csv(filePath)
