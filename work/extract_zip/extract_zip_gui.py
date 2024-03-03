@@ -1,7 +1,7 @@
 import tkinter as tk
 import glob
 import os
-from mymodule.extractzip.extractzip import extract_file
+from core.extractzip.extractzip import extract_file
 from tkinter import filedialog
 from tkinter import messagebox
 
@@ -34,7 +34,7 @@ def browse_directory():
             # メッセージを表示
             message_label.config(text="圧縮ファイルの解凍を実行中...")
             root.update()  # ウィンドウを更新
-            file_names = extract_file(f"{directory_path}/*")
+            extract_file(f"{directory_path}/*")
             # ここで実行する処理を追加
             message_label.config(text="処理が完了しました")
             messagebox.showinfo("実行結果", "完了しました。")
