@@ -1,4 +1,3 @@
-import pandas as pd
 import polars as pl
 
 
@@ -55,7 +54,6 @@ class ApacheLog(object):
         filter_jouken1 = (pl.col("Time") >= from_time)
         filter_jouken2 = (pl.col("Time") <= end_time)
         return self.logFile.filter(filter_jouken1 & filter_jouken2)
-    
     # CSVファイルに出力
     def to_csv(self, filePath: str):
         self.logFile.write_csv(filePath)
