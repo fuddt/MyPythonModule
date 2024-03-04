@@ -13,13 +13,25 @@ class ApacheLogReader(object):
                                   truncate_ragged_lines=True,
                                   new_columns=['IPaddress', 'Ignore1', 'Ignore2', 'DateTime', 'ignore3','URL', 
                                                 'HTTPSTATE', 'ResponseSize', 'RequestProcessingTime', 
-                                                'Referer', 'UserAgent', 'transmissionSize', 'Cookie', 'Ignore3'])
+                                                'Referer', 'UserAgent', 'transmissionSize', 'Cookie'])
         log = log.select(['IPaddress', 'DateTime', 'URL', 
                         'HTTPSTATE', 'ResponseSize', 'RequestProcessingTime', 
                         'Referer', 'UserAgent', 'transmissionSize', 'Cookie'])
         log = cls._process_datetime(log)
         log = cls._process_url(log)
-        return log
+        return log.select(pl.col(['IPaddress',
+                             'Day',
+                             'Time',
+                             'GET_POST',
+                             'URL',
+                             'HTTPSTATE',
+                             'ResponseSize',
+                             'RequestProcessingTime',
+                             'Referer',
+                             'UserAgent',
+                             'transmissionSize',
+                             'Cookie',
+                                 ]))
     
     @staticmethod
     def _process_datetime(df: pl.DataFrame) -> pl.DataFrame:
@@ -27,16 +39,16 @@ class ApacheLogReader(object):
             pl.col('DateTime').str.slice(1, 2).alias('Day'),
             pl.col('DateTime').str.slice(13).alias('Time'),
             # その他の日付関連の処理が必要な場合はここに追加
-        ])
+        ]).drop(["DateTime"])
 
     @staticmethod
     def _process_url(df: pl.DataFrame) -> pl.DataFrame:
         # URL列をスペースで分割し、新しい列を追加
         split_url = df.select(pl.col('URL').str.split(' ', inclusive=False).alias('split_url'))
         return df.with_columns([
-                                split_url['split_url'].arr.get(0).alias('GET_POST'),
-                                split_url['split_url'].arr.get(1).alias('URL')
-                            ]).drop(['split_url'])
+                    split_url['split_url'].list.get(0).alias('GET_POST'),
+                    split_url['split_url'].list.get(1).alias('URL')
+                ]).drop(['split_url'])
 
 class ApacheLog(object):
     def __init__(self, logFilePath: str):
@@ -56,6 +68,3 @@ class ApacheLog(object):
         filter_jouken2 = (pl.col("Time") <= end_time)
         return self.logFile.filter(filter_jouken1 & filter_jouken2)
     
-    # CSVファイルに出力
-    def to_csv(self, filePath: str):
-        self.logFile.write_csv(filePath)
