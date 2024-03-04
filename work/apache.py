@@ -11,7 +11,7 @@ class ApacheLogReader(object):
                                   ignore_errors = True,
                                   infer_schema_length=10000, 
                                   truncate_ragged_lines=True,
-                                  new_columns=['IPaddress', 'Ignore1', 'Ignore2', 'DateTime', 'URL', 
+                                  new_columns=['IPaddress', 'Ignore1', 'Ignore2', 'DateTime', 'ignore3','URL', 
                                                 'HTTPSTATE', 'ResponseSize', 'RequestProcessingTime', 
                                                 'Referer', 'UserAgent', 'transmissionSize', 'Cookie', 'Ignore3'])
         log = log.select(['IPaddress', 'DateTime', 'URL', 
