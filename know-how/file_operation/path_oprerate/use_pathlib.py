@@ -1,9 +1,6 @@
 """ """
 
 import pathlib
-
-# 以下　__file__ってなんだろう？って思ったらwhat_is__file__を参照。
-# とりあえず読み進めたい人は、__file__は現在のファイルのパスを取得するということだけ覚えておいてください。
 current_dir = pathlib.Path(__file__).parent
 file_name = "sample.txt"
 

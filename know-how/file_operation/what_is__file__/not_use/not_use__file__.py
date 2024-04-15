@@ -13,6 +13,6 @@ Cドライブ直下で実行した場合、Cドライブ直下にファイルが
 
 # ファイルを出力する
 # 出力場所は現在のディレクトリ
-if __name__ == '__main__':
-    with open('./sample.txt', 'w') as f:
-        f.write('Hello, World!')
+
+with open('./sample.txt', 'w') as f:
+    f.write('Hello, World!')
