@@ -24,3 +24,20 @@ print(file_name)  # 出力 sample.txt
 dir_name, file_name = os.path.split(path)
 print(dir_name)  # 出力 <現在ディレクトリ>
 print(file_name)  # 出力 sample.txt
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
