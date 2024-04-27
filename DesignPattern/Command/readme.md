@@ -1,0 +1,1 @@
+https://note.com/shirotabistudy/n/n6aded05bbf55
