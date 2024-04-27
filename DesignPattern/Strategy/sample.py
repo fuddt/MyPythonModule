@@ -36,3 +36,5 @@ print(list(result))
 context.set_strategy(ConcreteStrategyB())
 result = context.execute_strategy(data)
 print(list(result))
+
+
