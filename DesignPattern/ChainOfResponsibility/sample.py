@@ -63,3 +63,9 @@ info_handler.set_next(warn_handler).set_next(error_handler)
 print(info_handler.handle("info"))   # InfoHandler: Handling info
 print(info_handler.handle("warn"))   # WarnHandler: Handling warn
 print(info_handler.handle("error"))  # ErrorHandler: Handling error
+
+
+
+print("Hello, World!")
+
+
