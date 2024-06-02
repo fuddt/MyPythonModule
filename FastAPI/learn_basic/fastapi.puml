@@ -1,0 +1,35 @@
+@startuml
+title FastAPIのセットアップとアクセスのワークフロー
+
+|Mac|
+:UbuntuへのSSH接続を開く;
+|Ubuntu|
+
+:FastAPIとUvicornをインストールする;
+note right
+pip install fastapi uvicorn
+end note
+
+:FastAPIコードを持つmain.pyスクリプトを作成する;
+note right
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/")
+async def read_root():
+    return {"Hello": "World"}
+end note
+
+:Uvicornサーバーを実行する;
+note right
+uvicorn main:app - - host 0.0.0.0 - - port 8000 --reload
+end note
+
+|Mac|
+:MacのブラウザからFastAPIアプリケーションにアクセスする;
+note right
+http://192.168.0.**:8000
+end note
+
+@enduml

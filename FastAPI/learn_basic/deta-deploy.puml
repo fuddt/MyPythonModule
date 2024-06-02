@@ -1,0 +1,89 @@
+@startuml
+|ユーザー|
+start
+:FastAPIプロジェクトを作成;
+:main.pyを作成;
+:requirements.txtを作成
+---
+fastapi
+uvicorn
+pyotp
+python-dotenv
+---
+;
+:Spacefileを作成
+---
+name: my-fastapi-app
+runtime: python3.9
+entrypoint: uvicorn main:app --host 0.0.0.0 --port 8000
+env:
+  - USERNAME
+  - PASSWORD
+  - TOTP_SECRET
+---
+;
+:.envファイルを作成
+---
+USERNAME=mysecureusername
+PASSWORD=mysecurepassword123!
+TOTP_SECRET=JBSWY3DPEHPK3PXP
+---
+;
+
+|Deta CLI|
+:CLIをインストール
+---
+curl -fsSL https://get.deta.dev/cli.sh | sh
+---
+;
+:ログインコマンドを実行
+---
+deta login
+---
+;
+:プロジェクトディレクトリに移動
+---
+cd my-fastapi-app
+---
+;
+:プロジェクトをDeta Spaceにデプロイ
+---
+deta space new
+---
+;
+:デプロイ完了;
+
+|ユーザー|
+:ベーシック認証を設定
+main.pyを編集して認証を追加;
+:2段階認証(TOTP)を設定;
+
+if (TOTPシークレットキーの生成) then (yes)
+    :pyotpでシークレットキーを生成
+    ---
+    import pyotp
+    secret = pyotp.random_base32()
+    print("TOTP Secret:", secret)
+    ---
+    ;
+    :シークレットキーを.envファイルに追加;
+else (no)
+    stop
+endif
+
+|ユーザー|
+:APIエンドポイントにベーシック認証を追加;
+:2段階認証エンドポイントを追加;
+
+|Deta CLI|
+:プロジェクトを再デプロイ
+---
+deta space update
+---
+;
+:デプロイ完了;
+
+|ユーザー|
+:APIの動作確認;
+stop
+@enduml

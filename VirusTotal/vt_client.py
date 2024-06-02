@@ -4,14 +4,6 @@ import requests
 # 独自の例外クラス
 class VirusTotalAPIError(Exception):
     """VirusTotal APIエラー"""
-    def __init__(self, message = "APIエラー") -> None:
-        """コンストラクタ
-        
-        Args:
-            message (str): エラーメッセージ
-        """
-        super().__init__(message)
-
 
 class VtClient:
     """VirusTotal APIクライアントクラス"""
@@ -34,7 +26,7 @@ class VtClient:
         }
         self.url = None
 
-    def _post_request(self, endpoint, data=None) -> dict:
+    def _post_request(self, endpoint: str, data=None) -> dict:
         """POSTリクエストを送信する
         
         Args:
@@ -51,7 +43,7 @@ class VtClient:
             response = requests.get(url, headers=self.headers)
         return response.json()
 
-    def _url_id(self, url) -> dict:
+    def _url_id(self, url: str) -> dict:
         """URLのIDを取得する
         
         Args:
@@ -64,7 +56,7 @@ class VtClient:
         json_response = self._post_request("urls", data=data)
         return json_response["data"]["id"]
 
-    def url_analysis(self, url) -> None:
+    def url_analysis(self, url: str) -> None:
         """URLの解析を行う
         
         Args:
@@ -119,7 +111,7 @@ class VtClient:
         print(f"無害な検出数: {self.harmless()}")
         print(f"未検出数: {self.undetected()}")
     
-    def output_report(self, output_file) -> None:
+    def output_report(self, output_file: str) -> None:
         """解析結果をファイルに出力する
         
         Args:
