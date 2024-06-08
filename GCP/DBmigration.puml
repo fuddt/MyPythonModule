@@ -1,0 +1,59 @@
+@startuml
+title ローカルPC内DBのデータをGoogle Cloud SQLインスタンスへ移行する手順
+
+|ユーザー|
+start
+
+:Google Cloud Consoleにログイン;
+:GCloud SDKとCloud SQL Proxyのインストール;
+
+fork
+  :OSによって違う手順でGCloud SDKをインストール;
+  note right
+    curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-361.0.0-linux-x86_64.tar.gz\n
+    tar -xf google-cloud-sdk-361.0.0-linux-x86_64.tar.gz\n
+    ./google-cloud-sdk/install.sh\n
+    gcloud init\n
+  end note
+end fork
+
+fork
+  :OSによって違う手順でCloud SQL Proxyをインストール;
+  note right
+    curl -O https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64\n
+    chmod +x cloud_sql_proxy\n
+  end note
+end fork
+
+:GCloud ConsoleでCloud SQLインスタンスを作成;
+note right: MySQLまたはPostgreSQLを選択し、インスタンスの設定を行う;
+
+:MySQLダンプファイルを作成;
+note right: mysqldump -u username -p mydatabase > mydatabase.sql;
+
+:Cloud SQL Proxyをダウンロード;
+note right: curl -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.11.0/cloud-sql-proxy.darwin.arm64;
+
+:Cloud SQL Proxyに実行権限を付与;
+note right: chmod +x cloud-sql-proxy;
+
+:認証情報を設定;
+note right: gcloud auth application-default login;
+
+:Cloud SQL Proxyを実行;
+note right: ./cloud-sql-proxy --proxy-address=127.0.0.1 --proxy-port=3317 --instances=your-project-id:region:instance-id;
+
+:MySQLに接続;
+note right: mysql -u your-username -p -h localhost -P 3317;
+
+:新しいデータベースを作成;
+note right: create database mydatabase;
+
+:ダンプファイルをインポート;
+note right: mysql -u your-username -p -h localhost -P 3317 mydatabase < /path/to/mydatabase.sql;
+
+:データベースの確認;
+note right: use mydatabase; show tables;
+
+stop
+@enduml
