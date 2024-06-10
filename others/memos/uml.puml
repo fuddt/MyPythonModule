@@ -1,0 +1,17 @@
+@startuml
+actor User
+
+User -> A.py: Execute
+A.py -> Excel: Read management sheet
+A.py -> list.csv: Create file list
+
+User -> B.py: Execute
+B.py -> list.csv: Read file list
+B.py -> FileServer: Copy files to local
+B.py -> Local: Create zip file
+
+User -> C.py: Execute
+C.py -> Local: Read zip file
+C.py -> BOX: Upload zip file
+
+@enduml
