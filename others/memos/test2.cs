@@ -175,4 +175,55 @@ public static class Program
 }
 ```
 
-このようにして、フォームの描画したものの幅や高さを他のクラスで取得する方法として、プロパティを使用する方法やイベントを使用する方法を取ることができます。具体的な要件に応じて、適切な方法を選択してください。
+このようにして、フォームの描画したものの幅や高さを他のクラスで取得する方法として、プロパティを使用する方法やイベントを使用する方法を取ることができます。具体的な要件に応じて、適切な方法を選択してください
+
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+public partial class CustomImageViewer : Form
+{
+    private static CustomImageViewer _instance;
+
+    public static CustomImageViewer Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = new CustomImageViewer();
+            }
+            return _instance;
+        }
+    }
+
+    private CustomImageViewer()
+    {
+        InitializeComponent();
+        this.Paint += new PaintEventHandler(this.CustomImageViewer_Paint);
+    }
+
+    private void CustomImageViewer_Paint(object sender, PaintEventArgs e)
+    {
+        Graphics g = e.Graphics;
+        int formWidth = this.ClientSize.Width;
+        int formHeight = this.ClientSize.Height;
+        int centerX = formWidth / 2;
+        int centerY = formHeight / 2;
+        Pen pen = new Pen(Color.Black, 2);
+        g.DrawLine(pen, centerX, 0, centerX, formHeight);
+        g.DrawLine(pen, 0, centerY, formWidth, centerY);
+    }
+
+    // 中央のX座標を取得するプロパティ
+    public int CenterX
+    {
+        get { return this.ClientSize.Width / 2; }
+    }
+
+    // 中央のY座標を取得するプロパティ
+    public int CenterY
+    {
+        get { return this.ClientSize.Height / 2; }
+    }
+}
