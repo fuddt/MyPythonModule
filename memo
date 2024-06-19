@@ -5,3 +5,45 @@ if %ERRORLEVEL% neq 0 (
 ) else (
     del temp_error.log
 )
+
+
+import os
+
+def get_all_files_in_directory(directory):
+    """
+    指定したディレクトリ内のすべてのファイルのパスを取得し、セットに格納して返す。
+    """
+    file_paths = set()
+    for root, _, files in os.walk(directory):
+        for file in files:
+            file_paths.add(os.path.join(root, file))
+    return file_paths
+
+def check_partial_files_existence(file_paths, target_directory):
+    """
+    指定されたファイル名が部分一致でターゲットディレクトリ内に存在するかどうかをチェックする。
+    存在する場合はTrue、存在しない場合はFalseのリストを返す。
+    """
+    all_files = get_all_files_in_directory(target_directory)
+    existence_results = []
+    for file in file_paths:
+        found = any(file_part in full_file for full_file in all_files for file_part in file_paths)
+        existence_results.append(found)
+    return existence_results
+
+# 例として、調べるべきファイルのリストとターゲットディレクトリを指定
+file_paths_to_check = [
+    'file1',  # 部分一致で検索したいファイル名
+    'file2',
+    'file3',
+    # さらにファイルを追加
+]
+
+target_directory = '/path/to/target/directory'
+
+# 存在チェックを実行
+results = check_partial_files_existence(file_paths_to_check, target_directory)
+
+# 結果を出力
+for file, exists in zip(file_paths_to_check, results):
+    print(f'{file}: {"Exists" if exists else "Does not exist"}')
