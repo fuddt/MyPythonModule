@@ -1,0 +1,7 @@
+@echo off
+my_program.exe 2> temp_error.log
+if %ERRORLEVEL% neq 0 (
+    move temp_error.log error.log
+) else (
+    del temp_error.log
+)
