@@ -1,0 +1,53 @@
+@startuml
+
+title 永続ディスクの種類
+
+RECTANGLE ComputeEngine
+RECTANGLE PersistentDiskA
+RECTANGLE PersistentDiskB
+RECTANGLE Filestore
+RECTANGLE CloudStorage
+CIRCLE LocalSSD
+
+ComputeEngine : Compute Engine
+LocalSSD : Local SSD
+PersistentDiskA : Persistent Disk (Zone A)
+PersistentDiskB : Persistent Disk (Zone B)
+Filestore : Filestore
+CloudStorage : Cloud Storage
+
+ComputeEngine -down-> LocalSSD
+ComputeEngine -right-> PersistentDiskA
+ComputeEngine -right-> Filestore
+PersistentDiskA -right-> PersistentDiskB
+PersistentDiskB -down-> CloudStorage
+
+legend right
+  永続ディスクはネットワーク ストレージであるため、
+  通常は物理ディスクやローカルSSDよりもレイテン
+  シが大きくなる。
+  ディスクタイプの選択によってパフォーマンスは
+  変わる。
+
+  標準 永続ディスク：
+  コストが最も安いがパフォーマンスが出にくい
+
+  バランス 永続ディスク：
+  標準とSSDの中間
+
+  SSD 永続ディスク：
+  レイテンシが低く、多くのIOPSを提供
+
+  エクストリーム 永  エクストリーム 永続ディスク：
+  ハイエンド向けで必要なIOPSを設定可能
+end legend
+
+' Colors
+ComputeEngine #lightblue
+LocalSSD #pink
+PersistentDiskA #lightgrey
+PersistentDiskB #lightgrey
+Filestore #lightgrey
+CloudStorage #lightgrey
+
+@enduml

@@ -1,0 +1,68 @@
+@startuml
+title 永続ディスクの種類
+
+top to bottom direction
+
+node "Local SSD" as local_ssd
+node "リージョン永続ディスク" as region_disk
+node "ゾーン永続ディスク" as zone_disk
+node "Cloud Storage バケット" as cloud_bucket
+node "Filestore" as filestore
+
+local_ssd -[hidden]-> region_disk
+region_disk -[hidden]-> zone_disk
+zone_disk -[hidden]-> cloud_bucket
+cloud_bucket -[hidden]-> filestore
+
+local_ssd --|> "高パフォーマンス"
+local_ssd --|> "一時的"
+local_ssd --|> "可用性/耐久性/柔軟性: トレードオフ"
+
+region_disk --|> "2つのゾーンに複製"
+region_disk --|> "コスト: 2倍"
+
+zone_disk --|> "効率的/信頼性"
+zone_disk --|> "コスト: 安価"
+
+cloud_bucket --|> "手頃な料金"
+cloud_bucket --|> "グローバル利用"
+cloud_bucket --|> "低レイテンシ: 不要"
+
+filestore --|> "マウントして利用"
+filestore --|> "ゾーン/リージョン利用可能"
+filestore --|> "コスト: 高め"
+
+note right of local_ssd
+  ローカルSSDは、インスタンスに物理的に接続されたストレージです。
+  一時的なデータや高パフォーマンスが必要な場合に使用します。
+end note
+
+note right of region_disk
+  リージョン永続ディスクは、2つのゾーンに複製されるため、
+  ゾーン障害にも耐えられる耐久性を持ちます。
+end note
+
+note right of zone_disk
+  ゾーン永続ディスクは、ゾーン内でのみ利用可能です。
+  データの信頼性と効率的な利用を目指します。
+end note
+
+
+note right of cloud_bucket
+  Cloud Storage バケットは、グローバルに利用可能なオブジェクトストレージです。
+  低コストで大容量のデータを保存する際に使用します。
+end note
+
+note right of filestore
+  Filestoreは、NFSプロトコルを使用してファイルシステムを提供します。
+  ゾーンやリージョンでの利用が可能で、高いパフォーマンスが求められる場合に使用します。
+end note
+
+note bottom of local_ssd
+  ディスクのパフォーマンスを向上させるためには
+  永続ディスクのサイズを増やすことが有効です。
+  またはVMインスタンスのマシンタイプ変更やvCPU数の増加も検討してください。
+end note
+
+
+@enduml
