@@ -47,3 +47,19 @@ results = check_partial_files_existence(file_paths_to_check, target_directory)
 # 結果を出力
 for file, exists in zip(file_paths_to_check, results):
     print(f'{file}: {"Exists" if exists else "Does not exist"}')
+
+
+from openpyxl import load_workbook
+
+# Excelファイルを読み込む
+workbook = load_workbook('example.xlsx')
+
+# シートを選択
+sheet = workbook.active
+
+# 各列の列幅を取得して表示
+for column in sheet.columns:
+    first_cell = column[0]  # 各列の最初のセルを取得
+    col_letter = first_cell.column_letter  # 列のアルファベットを取得
+    col_width = sheet.column_dimensions[col_letter].width  # 列幅を取得
+    print(f"列 {col_letter}: 幅 {col_width}")
