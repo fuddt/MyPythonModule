@@ -1,0 +1,45 @@
+@startuml
+
+title Webシステム全体像
+
+
+
+node "iPhone" as iphone {
+  [ブラウザ]
+}
+
+node "自宅のルータ" as HomeRouter {
+
+}   
+
+node "ISP" as isp {
+  [インターネット]
+    cloud "My Google Cloud" as google_cloud {
+        node "VPNサーバ" as vpn {
+            [OpenVPN]
+        }
+
+        node "Webサーバ" as web_server {
+            [nginx]
+        }
+
+        node "Applicationサーバ" as app_server {
+            [Streamlit]
+            [sqlite3]
+        }
+
+
+        vpn <-u-> nginx
+        nginx <-r-> Streamlit
+        Streamlit - sqlite3
+        
+    }
+}
+
+
+
+iphone <-u-> HomeRouter  
+HomeRouter <-u-> isp 
+isp <-u-> vpn 
+ 
+@enduml

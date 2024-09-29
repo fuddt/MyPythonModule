@@ -1,0 +1,68 @@
+@startuml
+actor User
+
+node "External Firewall" {
+  [Firewall]
+}
+
+node "Load Balancer (Nginx)" {
+  [Nginx (Load Balancer)]
+}
+
+node "Internal Firewall" {
+  [Firewall]
+}
+
+node "Web Server 1" {
+  [Nginx]
+}
+
+node "Web Server 2" {
+  [Nginx2]
+}
+
+node "App Server 1" {
+  [Gunicorn]
+  [Django]
+}
+
+node "App Server 2" {
+  [Gunicorn2]
+  [Django2]
+}
+
+node "DB Server (Primary)" {
+  [PostgreSQL]
+}
+
+node "DB Server (Replica)" {
+  [PostgreSQL]
+}
+
+node "Cluster Management" {
+  [Floating IP]
+  [Heartbeat/Pacemaker]
+}
+
+User --> [External Firewall]
+[External Firewall] --> [Nginx (Load Balancer)]
+[Nginx (Load Balancer)] --> [Internal Firewall]
+[Internal Firewall] --> [Web Server 1]
+[Internal Firewall] --> [Web Server 2]
+
+[Web Server 1] --> [App Server 1]
+[Web Server 2] --> [App Server 2]
+
+[Gunicorn] --> [Django]
+[Gunicorn2] --> [Django2]
+
+[Django] --> [DB Server (Primary)]
+[Django2] --> [DB Server (Primary)]
+[Django] --> [DB Server (Replica)]
+[Django2] --> [DB Server (Replica)]
+
+[DB Server (Primary)] --> [DB Server (Replica)] : Replication
+[Floating IP] --> [Nginx (Load Balancer)]
+[Heartbeat/Pacemaker] --> [DB Server (Primary)]
+[Heartbeat/Pacemaker] --> [DB Server (Replica)]
+@enduml

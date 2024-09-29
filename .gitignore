@@ -7,8 +7,16 @@ learn
 Statistics
 *.ipy*
 exam/
-
-
+FastAPI/
+Keiba/
+BugStreamlit/
+EnglishApp/
+EnglishWord/
+AtCoder/
+others/memos/
+others/webapi/
+GCP/
+Streamlit/
 # 設定ファイルを無視
 .env
 config.py

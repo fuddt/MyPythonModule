@@ -1,0 +1,47 @@
+@startuml
+
+
+
+title VPNを使わない場合の通信経路
+
+top to bottom direction
+
+node "iPhone" as iphone {
+  [ブラウザ]
+}
+
+node "ISPネットワーク" as isp {
+  [ルーター]
+}
+
+node "インターネット" as internet {
+  [DNSサーバ]
+  [ウェブサイト]
+}
+
+iphone <-d--> isp : 1.インターネット接続\n2.DNSリクエスト\n5.IPアドレス応答転送\n6.ウェブサイトリクエスト\n9.コンテンツ転送
+isp <--d-> [DNSサーバ] : 3.DNSリクエスト転送\n4.IPアドレス応答
+isp <-d--> [ウェブサイト] : 7.リクエスト転送\n8.コンテンツ送信
+
+@enduml
+
+@startuml
+
+title VPNを使わない場合の通信フロー
+
+actor iPhone
+participant "ISPネットワーク" as ISP
+participant "DNSサーバ" as DNS
+participant "ウェブサイト" as Website
+
+iPhone -> ISP: 1. インターネット接続
+iPhone -> ISP: 2. DNSリクエスト
+ISP -> DNS: 3. DNSリクエスト転送
+DNS --> ISP: 4. IPアドレス応答
+ISP --> iPhone: 5. IPアドレス応答転送
+iPhone -> ISP: 6. ウェブサイトリクエスト
+ISP -> Website: 7. リクエスト転送
+Website --> ISP: 8. コンテンツ送信
+ISP --> iPhone: 9. コンテンツ転送
+
+@enduml

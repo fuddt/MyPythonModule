@@ -1,0 +1,15 @@
+@startuml
+title IPフォワーディングとNAT設定なしの通信経路
+
+actor "VPNクライアント" as Client
+participant "VPNサーバ" as VPN
+participant "インターネット" as Internet
+
+Client -> VPN: トラフィック送信
+group IPフォワーディングなし
+    VPN -> VPN: トラフィックを保持\n(インターネットに転送しない)
+end
+group NAT設定なし
+    VPN -> Internet: トラフィック送信失敗\n(プライベートIPのまま)
+end
+@enduml

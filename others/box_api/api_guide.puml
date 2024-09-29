@@ -1,0 +1,69 @@
+@startuml
+
+title 
+* **OAuth2.0認証のフロー(現実的ではないやり方ですが)**
+BOX を使ってやってみる
+
+end title
+
+top to bottom direction
+
+API提供しているサービスで開発者アカウントを作成 --> 開発者画面でアプリを作成する
+--> 大事なコードが発行される
+note right
+例:
+Client ID
+Client Secret
+end note
+
+--> "認証コード入手するためのリダイレクトURIを設定する
+開発者画面のどっかにあるはず
+"
+note right
+例: 自分のブログのURL
+https://note.com/myblog
+end note
+
+
+
+--> リダイレクトURIにアクセスする
+note right
+
+例:
+https://account.box.com/api/oauth2/authorize
+?response_type=code 
+&client_id=*~*~*~*
+&redirect_uri=*~*~*~*~*
+
+end note
+
+--> 認証画面を表示する
+--> ユーザーが認証を許可する
+
+
+
+--> 認証コードが発行される
+note right
+例:
+リダイレクトURIとして自分のブログのURLを指定した場合
+https://note.com/myblog?code=*~*~*~*
+のような形で自分のブログのURLの後ろに
+?code=<認証コード>という形で認証コードが発行される
+end note
+--> 認証コードをメモする
+note right
+すぐに消えるので注意 ものによっては1分
+end note
+
+--> "AccessTokenを取得するリクエストを送信する
+認証コード
+Client ID
+Client Secret
+を使う
+"
+
+--> AccessTokenが発行される
+--> AccessTokenをメモする
+--> "AccessTokenを使ってAPIを利用する"
+
+@enduml

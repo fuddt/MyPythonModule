@@ -1,0 +1,27 @@
+@startuml
+
+title VPNを使った場合の通信フロー
+
+actor iPhone
+participant "ISPネットワーク" as ISP
+participant "VPNサーバ" as VPN
+participant "VPNプロバイダのDNSサーバ" as VPNDNS
+participant "ウェブサイト" as Website
+
+iPhone -> ISP: 1. インターネット接続
+iPhone -> ISP: 2. VPN接続確立
+ISP -> VPN: 3. VPNトンネル経由での通信
+VPN -> VPNDNS: 4. DNSリクエスト転送
+VPNDNS -> VPN: 5. DNSリクエスト
+VPNDNS --> VPN: 6. IPアドレス応答
+VPN -> ISP: 7. DNS応答転送
+ISP -> iPhone: 8. DNS応答転送
+iPhone -> ISP: 9. DNS応答受信
+iPhone -> ISP: 10. ウェブサイトのIPアドレスに接続
+ISP -> VPN: 11. VPNトンネル経由での通信
+VPN -> Website: 12. ウェブサイトアクセス
+Website --> VPN: 13. コンテンツ送信
+VPN -> ISP: 14. コンテンツ転送
+ISP -> iPhone: 15. コンテンツ受信
+
+@enduml

@@ -1,0 +1,23 @@
+@startuml
+
+!theme mars
+
+actor "VPNクライアント" as Client
+
+
+box "OpenVPNサーバ"
+participant "OpenVPN" as Server
+participant "プライベート認証局(CA)" as CA
+end box
+
+CA -> CA: CA証明書と秘密鍵を生成
+CA -> Server: サーバー証明書を発行
+CA -> Client: クライアント証明書を発行
+
+Client -> Server: 接続要求
+Server -> Client: サーバー証明書を提示
+Client -> Client: CAの公開鍵でサーバー証明書を検証
+Client -> Server: クライアント証明書を提示
+Server -> Server: CAの公開鍵でクライアント証明書を検証
+Client <-> Server: 相互認証完了、暗号化通信開始
+@enduml

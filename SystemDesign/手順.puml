@@ -1,0 +1,30 @@
+@startuml
+start
+:新しいVMインスタンスを作成;
+:OpenVPNとEasy-RSAをインストール;
+
+:Easy-RSAを設定し証明書を生成;
+
+:OpenVPNの設定ファイルを作成;
+:証明書とキーを適切なディレクトリに配置;
+
+:IPフォワーディングを有効化;
+:sysctl -w net.ipv4.ip_forward=1;
+:永続化のために\n/etc/sysctl.confに設定を追加;
+:sysctl -pで設定を反映;
+
+:OpenVPNサーバを起動;
+
+:クライアント証明書とキーを生成;
+:クライアント設定ファイルを作成し転送;
+
+:Google CloudのVPCネットワークで\nファイアウォールルールを作成;
+
+:NATを設定;
+:sudo iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE;
+:iptables-persistentをインストールして\nNATルールを保存;
+:sudo netfilter-persistent save;
+:sudo netfilter-persistent reload;
+
+stop
+@enduml

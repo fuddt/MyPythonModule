@@ -1,0 +1,14 @@
+@startuml
+actor User
+
+participant "External Firewall" as FW1
+participant "Load Balancer (Nginx)" as LB
+participant "Internal Firewall" as FW2
+participant "Web Server 1 (Nginx)" as WS1
+
+User -> FW1: リクエスト
+FW1 -> LB: リクエスト
+LB -> FW2: リクエスト
+FW2 -> WS1: リクエスト
+WS1 -> User: 静的コンテンツを返す
+@enduml

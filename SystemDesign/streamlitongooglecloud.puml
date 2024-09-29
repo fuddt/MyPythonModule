@@ -1,0 +1,18 @@
+@startuml
+
+top to bottom direction
+
+node "Webサーバ" {
+ [nginx]
+  
+}
+
+node "Applicationサーバ" {
+[streamlit]
+[sqlite]
+  
+}
+nginx --> streamlit
+streamlit -> sqlite
+sqlite --> streamlit
+@enduml

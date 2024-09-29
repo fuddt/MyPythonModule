@@ -1,0 +1,20 @@
+@startuml
+actor User
+
+node "Web Server" {
+  [Nginx]
+}
+
+node "App Server" {
+  [Gunicorn]
+  [Django]
+}
+
+node "DB Server" {
+  [PostgreSQL]
+}
+
+User --> [Nginx]
+[Nginx] --> [Gunicorn]
+[Gunicorn] --> [PostgreSQL]
+@enduml

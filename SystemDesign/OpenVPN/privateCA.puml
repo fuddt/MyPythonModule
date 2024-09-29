@@ -1,0 +1,28 @@
+@startuml
+!theme mars
+
+actor "VPNクライアント" as Client
+
+
+box "OpenVPNサーバ"
+participant "OpenVPN" as Server
+participant "プライベート認証局(CA)" as CA
+end box
+
+CA -> CA: CA証明書 (ca.crt),\nサーバー証明書 (server.crt),\nクライアント証明書 (client.crt) を生成
+
+CA -> Server: CA証明書 (ca.crt),\nサーバー証明書 (server.crt),\nサーバー秘密鍵 (server.key) を配置
+
+CA -> Client: CA証明書 (ca.crt),\nクライアント証明書 (client.crt),\nクライアント秘密鍵 (client.key) を配布\n(.ovpnファイルに含める)
+
+Client -> Server: 接続要求
+Server --> Client: サーバー証明書 (server.crt) を送信
+
+Client -> Client: CA証明書 (ca.crt) を使用して\nサーバー証明書を検証
+
+Client --> Server: クライアント証明書 (client.crt) を送信
+
+Server -> Server: CA証明書 (ca.crt) を使用して\nクライアント証明書を検証
+
+Client <-> Server: 相互認証完了、暗号化通信開始
+@enduml

@@ -1,0 +1,31 @@
+@startuml
+!define RECTANGLE node
+
+
+
+RECTANGLE "内部ネットワーク" as Internal {
+    RECTANGLE "デバイスA\n192.168.1.2" as DeviceA
+    RECTANGLE "デバイスB\n192.168.1.3" as DeviceB
+    RECTANGLE "デバイスC\n192.168.1.4" as DeviceC
+    RECTANGLE "デバイスD\n192.168.1.5" as DeviceD
+}
+
+RECTANGLE "NAT\nルーター" as NAT
+
+RECTANGLE "インターネット" as Internet {
+    RECTANGLE "ウェブサーバー\n203.0.113.1" as WebServer
+}
+
+DeviceA ---> NAT : 送信元: 192.168.1.2:1234\n宛先: 203.0.113.1:80
+NAT ---> DeviceA : 送信元: 203.0.113.1:80\n宛先: 192.168.1.2:1234
+NAT ----> WebServer : 送信元: 11.22.33.44:5678\n宛先: 203.0.113.1:80
+WebServer ----> NAT : 送信元: 203.0.113.1:80\n宛先: 11.22.33.44:5678
+
+
+note bottom of NAT
+  NATテーブル
+  内部IP:ポート <-> 外部IP:ポート
+  192.168.1.2:1234 <-> 11.22.33.44:5678
+end note
+
+@enduml

@@ -1,0 +1,14 @@
+@startuml
+title IPフォワーディングとNAT設定後の通信経路
+
+actor "VPNクライアント" as Client
+participant "VPNサーバ" as VPN
+participant "インターネット" as Internet
+
+Client -> VPN: トラフィック送信
+VPN -> VPN: IPフォワーディングによりトラフィックを転送
+VPN -> Internet: NATによりプライベートIPを\nパブリックIPに変換しトラフィック送信
+Internet -> VPN: トラフィック受信
+VPN -> VPN: NATによりパブリックIPを\nプライベートIPに変換
+VPN -> Client: トラフィック受信
+@enduml

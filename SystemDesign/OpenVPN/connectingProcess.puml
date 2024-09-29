@@ -1,0 +1,35 @@
+@startuml
+
+!theme mars
+
+actor "VPNクライアント" as Client
+participant "OpenVPNサーバー" as Server
+
+== 初期設定 ==
+Server -> Server: Easy-RSAを使い\nCA証明書 (ca.crt)\nサーバー証明書 (server.crt)\nクライアント証明書 (client.crt) を生成
+note over Server: CA証明書（ca.crt）\nサーバー証明書（server.crt）\nサーバー秘密鍵（server.key）を保持
+Server -> Client: CA証明書 (ca.crt)\nクライアント証明書 (client.crt)\nクライアント秘密鍵 (client.key) を配布\n(.ovpnファイルに記述)
+note over Client: CA証明書（ca.crt）\nクライアント証明書（client1.crt）\nクライアント秘密鍵（client1.key）を保持
+
+== 接続プロセス ==
+Client -> Server: 接続要求
+Server --> Client: サーバー証明書（server.crt）を送信
+
+Client -> Client: CA証明書（ca.crt）を使用して\nサーバー証明書（server.crt）を検証
+
+group サーバー証明書が無効 
+    Client -> Client: 接続を中断
+else サーバー証明書が有効
+    Client --> Server: クライアント証明書（client1.crt）を送信
+
+    Server -> Server: CA証明書（ca.crt）を使用して\nクライアント証明書（client1.crt）を検証
+
+    group クライアント証明書が無効
+        Server -> Server: 接続を拒否
+    else クライアント証明書が有効
+        Server -> Client: 認証成功、セッションキーを交換
+        Client <-> Server: 暗号化されたVPN通信開始
+    end
+end
+
+@enduml

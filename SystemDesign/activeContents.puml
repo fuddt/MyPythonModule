@@ -1,0 +1,42 @@
+@startuml
+actor User
+
+participant "External Firewall" as FW1
+participant "Load Balancer (Nginx)" as LB
+participant "Internal Firewall" as FW2
+participant "Web Server 1 (Nginx)" as WS1
+participant "App Server 1 (Gunicorn)" as AS1
+participant "DB Server (Primary) (PostgreSQL)" as DB
+
+== 静的コンテンツ ==
+
+    User -> FW1: リクエスト
+    note right of FW1: パケットフィルタリング\nステートフルインスペクション
+    FW1 -> LB: リクエスト
+    note right of LB: リクエスト分散\n負荷分散
+    LB -> FW2: リクエスト
+    note right of FW2: 内部ネットワーク保護\nアクセス制御
+    FW2 -> WS1: リクエスト
+    note right of WS1: 静的コンテンツ提供
+    WS1 -> User: 静的コンテンツを返す
+
+
+== 動的コンテンツ ==
+
+    User -> FW1: リクエスト
+    note right of FW1: パケットフィルタリング\nステートフルインスペクション
+    FW1 -> LB: リクエスト
+    note right of LB: リクエスト分散\n負荷分散
+    LB -> FW2: リクエスト
+    note right of FW2: 内部ネットワーク保護\nアクセス制御
+    FW2 -> WS1: リクエスト
+    note right of WS1: リクエストのプロキシ\nアプリケーションサーバへの転送
+    WS1 -> AS1: リクエスト
+    note right of AS1: ビジネスロジックの実行
+    AS1 -> DB: データベースクエリ
+    note right of DB: データ取得
+    DB -> AS1: データベースレスポンス
+    AS1 -> WS1: レンダリングされたHTML
+    WS1 -> User: 動的コンテンツを返す
+
+@enduml

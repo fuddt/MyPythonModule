@@ -1,0 +1,13 @@
+@startuml
+actor User
+
+node "Small Server" {
+  [Nginx]
+  [Gunicorn]
+  [PostgreSQL]
+}
+
+User --> [Nginx]
+[Nginx] --> [Gunicorn]
+[Gunicorn] --> [PostgreSQL]
+@enduml

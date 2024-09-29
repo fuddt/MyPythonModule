@@ -1,0 +1,66 @@
+@startuml
+
+title VPNを使った場合の通信経路 (詳細)
+
+top to bottom direction
+
+node "iPhone" as iphone {
+  [VPNクライアント]
+  [ブラウザ]
+}
+
+node "自宅のルータ" as home_router {
+}
+
+node "ISPネットワーク" as isp {
+}
+
+node "VPNサーバ" as vpn {
+  [IPフォワーディング]
+  [NAT]
+}
+
+node "インターネット" as internet {
+  [VPNプロバイダのDNSサーバ]
+  [ウェブサイト]
+}
+
+iphone <-d-> home_router : 1. インターネット接続\n2. VPN接続確立\n9. DNS応答受信\n10. ウェブサイトのIPアドレスに接続\n15. コンテンツ受信
+home_router <-d-> isp : 3. VPNトンネル経由での通信\n8. DNS応答転送\n11. VPNトンネル経由での通信\n14. コンテンツ転送
+isp <-d-> vpn : 4. DNSリクエスト転送\n7. DNS応答転送\n12. ウェブサイトアクセス要求転送\n13. コンテンツ転送
+vpn <-d-> [VPNプロバイダのDNSサーバ] : 5. DNSリクエスト\n6. IPアドレス応答
+vpn <-d-> [ウェブサイト] : 12. ウェブサイトアクセス\n13. コンテンツ受信
+
+@enduml
+
+@startuml
+
+title VPNを使った場合の通信フロー
+
+actor iPhone
+participant "自宅のルータ" as HomeRouter
+participant "ISPネットワーク" as ISP
+participant "VPNサーバ" as VPN
+participant "DNSサーバ" as VPNDNS
+participant "ウェブサイト" as Website
+
+iPhone -> HomeRouter: 1. インターネット接続
+iPhone -> HomeRouter: 2. VPN接続確立
+HomeRouter -> ISP: 3. VPNトンネル経由での通信
+ISP -> VPN: 4. VPNトンネル経由での通信
+VPN -> VPNDNS: 5. DNSリクエスト転送
+VPNDNS -> VPN: 6. DNSリクエスト
+VPNDNS --> VPN: 7. IPアドレス応答
+VPN -> ISP: 8. DNS応答転送
+ISP -> HomeRouter: 9. DNS応答転送
+HomeRouter -> iPhone: 10. DNS応答受信
+iPhone -> HomeRouter: 11. ウェブサイトのIPアドレスに接続
+HomeRouter -> ISP: 12. VPNトンネル経由での通信
+ISP -> VPN: 13. VPNトンネル経由での通信
+VPN -> Website: 14. ウェブサイトアクセス
+Website --> VPN: 15. コンテンツ送信
+VPN -> ISP: 16. コンテンツ転送
+ISP -> HomeRouter: 17. コンテンツ転送
+HomeRouter -> iPhone: 18. コンテンツ受信
+
+@enduml

@@ -1,0 +1,43 @@
+
+@startmindmap
+!theme vibrant
+<style>
+mindmapDiagram {
+    node {
+        BackgroundColor white
+    }
+    :depth(1) {
+      BackGroundColor lightBlue
+    }
+    :depth(2) {
+      BackGroundColor lightPink
+    }
+    :depth(3) {
+        BackgroundColor lightGreen
+    }
+    :depth(4) {
+        BackgroundColor lightGrey
+    }
+}
+</style>
+
++ HTTPリクエスト
+++ リクエストライン
++++ メソッド (GET, POST, PUT, DELETE, etc.)
+++++ 速達、普通、レターパック、定形外郵便、ゆうメール、国際郵便
++++ URL
+++++ 宛先
++++ プロトコルバージョン (HTTP/1.1, HTTP/2, etc.)
+++ ヘッダー
++++ ホスト 
+++++ 以下の項目は封筒に書く 履歴書在中 重要書類在中 保険証在中などの中身を示すところ
++++ コンテンツタイプ text/html, application/json,
+++++ 送信元に伝える：この手紙は英語で書かれているよとお知らせする
++++ 認証
++++ キャッシュ制御
++++ その他のヘッダー acceptなどの受け入れ可能なレスポンスのMIMEタイプを指定する
+++++ 受け取る時に「この手紙は英語で返事をしてほしい」とか「この書類はPDF形式で送ってほしい」といった要望を書く
+++ ボディ
++++ データ内容 (JSON, XML, FormData, etc.)
+++++ 本文
+@endmindmap
