@@ -1,4 +1,5 @@
 # GitHubに挙げたくないproject
+g_cloud_run/
 know-how
 *.md
 .DS_Store
