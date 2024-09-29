@@ -6,6 +6,8 @@ GUI
 learn
 Statistics
 *.ipy*
+exam/
+
 
 # 設定ファイルを無視
 .env
