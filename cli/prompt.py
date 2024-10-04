@@ -43,18 +43,31 @@ class Prompt:
         if not callable(self.output):
             raise TypeError(f"output must be a callable, got {type(self.output).__name__}")
 
-    def ask(self):
+    def ask(self) -> bool:
+        """プロンプトの表示
+
+        Returns:
+            bool: 何かしら入力があったらTrue, 1つ前に戻るのときはFalse
+        """
+        # 質問
         print(self.message)
+        
+        # 選択肢の表示
         for i, choice in enumerate(self.choices, 1):
             print(f"{i}. {choice}")
+            
+        # 注意事項の表示(あれば)
         if self.attention:
             if isinstance(self.attention, str):
                 print(self.attention)
             else:
                 print("\n".join(self.attention))
+        
+        # 1つ前に戻る選択肢の表示
         if self.go_back:
             print("r: 1つ前に戻る")
 
+        # 入力値
         while True:
             response = input("入力値: ")
             try:
@@ -79,6 +92,11 @@ class PromptController:
         self.current_prompt_index = 0
         
     def add_prompt(self, prompt: Prompt) -> None:
+        """プロンプトを追加する関数
+
+        Args:
+            prompt (Prompt): Promptクラスのインスタンス
+        """
         self.prompts.append(prompt)
 
     def _confirm(self, obj: Callable) -> None:
@@ -100,9 +118,12 @@ class PromptController:
                 print("無効な選択です")
                 
     def run(self, confirm_dialog: Callable | None = None) -> None:
+        """プロンプトを実行する関数"""
+        # 最初のプロンプトがgo_back=Trueの場合はエラーを出す
         if self.prompts[0].go_back:
             raise ValueError("The first prompt cannot have go_back=True")
 
+        # プロンプトを1つずつ実行
         while self.current_prompt_index < len(self.prompts):
             prompt = self.prompts[self.current_prompt_index]
             if prompt.ask():
@@ -110,7 +131,7 @@ class PromptController:
             else:
                 if self.current_prompt_index > 0:
                     self.current_prompt_index -= 1
-
+            # 最後のプロンプトの場合は確認用のプロンプトを表示（あれば）
             if self.current_prompt_index == len(self.prompts) and confirm_dialog is not None:
                 self._confirm(confirm_dialog)
 
