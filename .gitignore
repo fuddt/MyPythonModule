@@ -23,7 +23,7 @@ Streamlit/
 config.py
 *.ini
 config/
-
+config.csv
 # その他の設定ファイルがあればここに追記
 vt-py/
 
