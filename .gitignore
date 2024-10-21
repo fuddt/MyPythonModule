@@ -18,6 +18,7 @@ others/memos/
 others/webapi/
 GCP/
 Streamlit/
+cicd/
 # 設定ファイルを無視
 .env
 config.py
@@ -26,6 +27,7 @@ config/
 config.csv
 # その他の設定ファイルがあればここに追記
 vt-py/
+*.toml
 
 # Byte-compiled / optimized / DLL files
 *.py[cod]
